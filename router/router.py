@@ -33,7 +33,7 @@ def get_matchs():
 @match.get("/api/match/{pet_id}")
 def get_pet_matchs(pet_id:int, response_model=List[MatchSchema]):
     with engine.connect() as conn:
-        matchs = conn.execute(pareja.select().where(or_(pareja.c.idMascota1==pet_id,pareja.c.idMascota2==pet_id ))).fetchall()
+        matchs = conn.execute(pareja.select().where(or_(pareja.c.idmascota1==pet_id,pareja.c.idmascota2==pet_id ))).fetchall()
         result=[]
         for u in matchs:
             result.append(u._mapping)
@@ -62,7 +62,7 @@ def create_match(data_match:MatchSchema):
 def delete_match(pet_id:int,pet_id2:int):
     with engine.connect() as conn:
         # result=
-        conn.execute(pareja.delete().where(and_(pareja.c.idMascota1==pet_id,pareja.c.idMascota2==pet_id2)))
+        conn.execute(pareja.delete().where(and_(pareja.c.idmascota1==pet_id,pareja.c.idmascota2==pet_id2)))
         conn.commit()
         # print(result)
     return Response(status_code=HTTP_204_NO_CONTENT)
