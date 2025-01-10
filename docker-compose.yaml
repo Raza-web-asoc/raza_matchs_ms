@@ -5,4 +5,27 @@ services:
         build: .
         command: sh -c "uvicorn main:app --reload --port=8000 --host=0.0.0.0"
         ports:
-            - 8000:8000
+            - 8004:8000
+        volumes:
+            - .:/app
+        env_file:
+            -   .env
+        depends_on:
+            - raza_match_db
+
+    raza_match_db:
+        image: postgres
+        container_name: raza_match_db
+        restart: always
+        environment:
+            - POSTGRES_USER=$RAZA_MATCH_DB_USER
+            - POSTGRES_PASSWORD=$RAZA_MATCH_DB_PASSWORD
+            - POSTGRES_DB=$RAZA_MATCH_DB_NAME
+            - POSTGRES_HOST=raza_match
+        ports:
+            - $RAZA_MATCH_LOCAL_PORT:$RAZA_MATCH_DB_PORT_DOCKER
+
+
+networks:
+    autenticador_network:
+        external: true

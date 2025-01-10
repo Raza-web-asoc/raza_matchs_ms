@@ -1,69 +1,46 @@
-from fastapi import APIRouter,Response
+from fastapi import APIRouter, Response, Depends
 from schema.match_schema import MatchSchema
-from config.db import engine
-from model.matchs import pareja
-from sqlalchemy import and_,or_
+from config.db import db_dependency
+from model.matchs import Pareja
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.ext.declarative import DeclarativeMeta
-import json
 from typing import List
 from starlette.status import HTTP_204_NO_CONTENT
+from sqlalchemy import or_ , and_
 
 
-
-match=APIRouter()
+match = APIRouter()
 
 @match.get("/")
 def root():
     return {"message": "Hi from raza with router"}
 
 @match.get("/api/match", response_model=List[MatchSchema])
-def get_matchs():
-    with engine.connect() as conn:
-        matchs = conn.execute(pareja.select()).fetchall()
-        result=[]
-        for u in matchs:
-            result.append(u._mapping)
-            print(u._mapping)
-        print(result)
-        return result
+def get_matchs(db: db_dependency):
+    matchs = db.query(Pareja).all()
+    return [MatchSchema(idmascota1=match.idmascota1, idmascota2=match.idmascota2) for match in matchs]
 
-
-
-@match.get("/api/match/{pet_id}")
-def get_pet_matchs(pet_id:int, response_model=List[MatchSchema]):
-    with engine.connect() as conn:
-        matchs = conn.execute(pareja.select().where(or_(pareja.c.idmascota1==pet_id,pareja.c.idmascota2==pet_id ))).fetchall()
-        result=[]
-        for u in matchs:
-            result.append(u._mapping)
-            print(u._mapping)
-        print(result)
-        return result
+@match.get("/api/match/{pet_id}", response_model=List[MatchSchema])
+def get_pet_matchs(db: db_dependency, pet_id: int):
+    matchs = db.query(Pareja).filter(
+        or_(Pareja.idmascota1 == pet_id, Pareja.idmascota2 == pet_id)
+    ).all()
+    return [MatchSchema(idmascota1=match.idmascota1, idmascota2=match.idmascota2) for match in matchs]
 
 @match.post("/api/match")
-def create_match(data_match:MatchSchema):
-    with engine.connect() as conn:
-        new_match=data_match.dict()
-        print(data_match)
-        print(new_match)
-        result = ""
-        try:
-            result = conn.execute(pareja.insert().values(new_match))
-            conn.commit()
-            print(f"Insert successful, rows affected: {result.rowcount}")
-            result=f"Insert successful, rows affected: {result.rowcount}"
-        except SQLAlchemyError as e:
-            print(f"Error inserting data: {str(e)}")
-            result=f"Error inserting data: {str(e)}"
-        return result
+def create_match(db: db_dependency, data_match: MatchSchema):
+    new_match = Pareja(idmascota1=data_match.idmascota1, idmascota2=data_match.idmascota2)
+    try:
+        db.add(new_match)
+        db.commit()
+        return {"message": "Insert successful"}
+    except SQLAlchemyError as e:
+        db.rollback()
+        return {"error": f"Error inserting data: {str(e)}"}
 
-@match.delete("/api/match/{pet_id}-{pet_id2}",status_code=HTTP_204_NO_CONTENT)
-def delete_match(pet_id:int,pet_id2:int):
-    with engine.connect() as conn:
-        # result=
-        conn.execute(pareja.delete().where(and_(pareja.c.idmascota1==pet_id,pareja.c.idmascota2==pet_id2)))
-        conn.commit()
-        # print(result)
+@match.delete("/api/match/{pet_id}-{pet_id2}", status_code=HTTP_204_NO_CONTENT)
+def delete_match(db: db_dependency, pet_id: int, pet_id2: int):
+    db.query(Pareja).filter(
+        and_(Pareja.idmascota1 == pet_id, Pareja.idmascota2 == pet_id2)
+    ).delete()
+    db.commit()
     return Response(status_code=HTTP_204_NO_CONTENT)
-    
