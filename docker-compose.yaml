@@ -1,7 +1,8 @@
 version: '3'
 
 services:
-    web:
+    raza-matchs-ms:
+        container_name: raza-matchs-ms
         build: .
         command: sh -c "uvicorn main:app --reload --port=8000 --host=0.0.0.0"
         ports:
@@ -11,11 +12,11 @@ services:
         env_file:
             -   .env
         depends_on:
-            - raza_match_db
+            - raza-match-db
 
-    raza_match_db:
+    raza-match-db:
         image: postgres
-        container_name: raza_match_db
+        container_name: raza-match-db
         restart: always
         environment:
             - POSTGRES_USER=$RAZA_MATCH_DB_USER
