@@ -188,3 +188,8 @@ def get_matchs(db: db_dependency):
 def get_matchs_by_id(db: db_dependency, id_pet: int):
     matchs = db.query(Pareja).filter(Pareja.id_mascota1 == id_pet).all()
     return [MatchSchema(idmascota1=match.id_mascota1, idmascota2=match.id_mascota2, estado=match.estado) for match in matchs]
+
+@match.get("/api/interaction/{id_pet}", response_model=List[InteraccionSchema])
+def get_interactions_by_id(db: db_dependency, id_pet: int):
+    interactions = db.query(Interaccion).filter(Interaccion.id_mascota1 == id_pet).all()
+    return [InteraccionSchema(id_mascota1=interaction.id_mascota1, id_mascota2=interaction.id_mascota2, tipo_interaccion=interaction.tipo_interaccion) for interaction in interactions]
