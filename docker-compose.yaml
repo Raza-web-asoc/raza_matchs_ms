@@ -10,9 +10,10 @@ services:
         volumes:
             - .:/app
         env_file:
-            -   .env
+            - .env
         depends_on:
-            - raza-match-db
+            raza-match-db:
+                condition: service_healthy
         networks:
             - autenticador_network
 
@@ -29,7 +30,11 @@ services:
             - $RAZA_MATCH_LOCAL_PORT:$RAZA_MATCH_DB_PORT_DOCKER
         networks:
             - autenticador_network
-
+        healthcheck:
+            test: [ "CMD", "pg_isready", "-U", "$RAZA_MATCH_DB_USER", "-d", "$RAZA_MATCH_DB_NAME" ]
+            interval: 15s
+            timeout: 15s
+            retries: 15
 
 networks:
     autenticador_network:
