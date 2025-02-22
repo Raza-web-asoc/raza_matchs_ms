@@ -21,6 +21,17 @@ engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False,bind=engine)
 
+
+
+def init_db():
+    try:
+        engine.connect()
+        print("Conectadooooooo")
+    except Exception as error:
+        print(f"Error al conectar a la base de datos: {error}")
+        
+    Base.metadata.create_all(bind=engine)
+
 def get_db():
     db = SessionLocal()
     try:
