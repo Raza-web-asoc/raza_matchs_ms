@@ -17,25 +17,6 @@ services:
         networks:
             - autenticador_network
 
-    raza-match-db:
-        image: postgres
-        container_name: raza-match-db
-        restart: always
-        environment:
-            - POSTGRES_USER=$RAZA_MATCH_DB_USER
-            - POSTGRES_PASSWORD=$RAZA_MATCH_DB_PASSWORD
-            - POSTGRES_DB=$RAZA_MATCH_DB_NAME
-            - POSTGRES_HOST=raza_match
-        ports:
-            - $RAZA_MATCH_LOCAL_PORT:$RAZA_MATCH_DB_PORT_DOCKER
-        networks:
-            - autenticador_network
-        healthcheck:
-            test: [ "CMD", "pg_isready", "-U", "$RAZA_MATCH_DB_USER", "-d", "$RAZA_MATCH_DB_NAME" ]
-            interval: 15s
-            timeout: 15s
-            retries: 15
-
 networks:
     autenticador_network:
         external: true
