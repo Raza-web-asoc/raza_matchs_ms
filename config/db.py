@@ -12,10 +12,10 @@ DB_PORT = os.getenv("RAZA_MATCH_DB_PORT_DOCKER")  # Puerto predeterminado para P
 DB_PASSWORD = os.getenv("RAZA_MATCH_DB_PASSWORD")
 DB_NAME = os.getenv("RAZA_MATCH_DB_NAME")
 DB_USER = os.getenv("RAZA_MATCH_DB_USER")
-DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_HOST = os.getenv("DB_HOST")
 
 # URL de conexión para PostgreSQL
-URL_DATABASE = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+URL_DATABASE = f"mysql+pymysql//{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 engine = create_engine(URL_DATABASE)
 
