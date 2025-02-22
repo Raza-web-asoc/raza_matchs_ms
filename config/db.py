@@ -8,27 +8,18 @@ import os
 
 load_dotenv()
 
-DB_PORT = os.getenv("RAZA_MATCH_DB_PORT_DOCKER")  # Puerto predeterminado para PostgreSQL
-DB_PASSWORD = os.getenv("RAZA_MATCH_DB_PASSWORD")
-DB_NAME = os.getenv("RAZA_MATCH_DB_NAME")
-DB_USER = os.getenv("RAZA_MATCH_DB_USER")
+DB_PORT = os.getenv("DB_PORT")  # Puerto predeterminado para PostgreSQL
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
 DB_HOST = os.getenv("DB_HOST")
 
 # URL de conexión para PostgreSQL
-URL_DATABASE = f"mysql+pymysql//{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:3306/{DB_NAME}"
 
-engine = create_engine(URL_DATABASE)
+engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False,bind=engine)
-
-def init_db():
-    try:
-        engine.connect()
-        print("Conectado a la Base de Datos")
-    except Exception as error:
-        print(f"Error al conectar a la base de datos: {error}")
-
-    Base.metadata.create_all(bind=engine)
 
 def get_db():
     db = SessionLocal()
@@ -36,5 +27,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
-db_dependency = Annotated[Session, Depends(get_db)]
