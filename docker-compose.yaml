@@ -11,9 +11,6 @@ services:
             - .:/app
         env_file:
             - .env
-        depends_on:
-            raza-match-db:
-                condition: service_healthy
         networks:
             - autenticador_network
 
