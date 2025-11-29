@@ -4,7 +4,6 @@ services:
     raza-matchs-ms:
         container_name: raza-matchs-ms
         build: .
-        command: sh -c "uvicorn main:app --reload --port=8000 --host=0.0.0.0"
         ports:
             - 8004:8000
         volumes:
@@ -13,6 +12,28 @@ services:
             - .env
         networks:
             - autenticador_network
+        depends_on:
+            raza_match_db:
+                condition: service_healthy
+        command: sh -c "uvicorn main:app --reload --port=8000 --host=0.0.0.0"
+
+    raza_match_db:
+        image: mysql:8.0
+        container_name: raza_match_db
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: razamatch
+            MYSQL_DATABASE: raza_match
+            MYSQL_USER: raza_match
+            MYSQL_PASSWORD: razamatch
+        ports:
+            - 3310:3306
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+
 
 networks:
     autenticador_network:

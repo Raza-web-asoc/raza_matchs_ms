@@ -1,4 +1,4 @@
-from fastapi import  Depends
+from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from typing import Annotated
@@ -8,25 +8,23 @@ import os
 
 load_dotenv()
 
-DB_PORT = os.getenv("DB_PORT")  # Puerto predeterminado para PostgreSQL
+DB_PORT = os.getenv("DB_PORT")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_HOST = os.getenv("DB_HOST")
 
-# URL de conexión para PostgreSQL
-DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:3306/{DB_NAME}"
-
-engine = create_engine(DATABASE_URL)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False,bind=engine)
+URL_DATABASE  = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 
+engine = create_engine(URL_DATABASE )
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def init_db():
     try:
         engine.connect()
-        print("Conectadooooooo")
+        print("Conectado a MySQL correctamente")
     except Exception as error:
         print(f"Error al conectar a la base de datos: {error}")
         
